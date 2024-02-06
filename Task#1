@@ -2,20 +2,25 @@ import pytest
 import random, string
 import yaml
 from datetime import datetime
-import crc
-
+from sshcmd import ssh_checkout, ssh_getout, upload_files, download_files, ssh_checkout_negative
 import subprocess
+
+# dpkg -l | grep 7zip - команда для поиска пакета в системе (первая часть выдает просто список всех пакетов,
+# вторая - ищем конкретный пакет)
+# dpkg -r 7zip-full -удаление пакета
+# su <name_user> - команда для перехода от юзера к юзеру
+# sudo dpkg -i ./p7zip-full.ded - установка 7z
+
 
 with open('config.yaml') as f:
     # читаем документ YAML
     data = yaml.safe_load(f)
 
 
-def checkout(path: str, text: str):
-    result = subprocess.run(path, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
-    lst = result.stdout.split("\n") + result.stderr.split("\n")
-    print(lst, text in lst)
-    if text in lst:
+def checkout(comand, text):
+    result = subprocess.run(comand, shell=True, stdout=subprocess.PIPE, encoding='utf-8')
+    print(result.stdout)
+    if text in result.stdout and result.returncode == 0:
         return True
     else:
         return False
@@ -88,6 +93,15 @@ def find_subprocess(path: str, text: str):
         return False
 
 class Test_positiv:
+    def test_step0(self):
+        res = []
+        upload_files("0.0.0.0", "user2", "11", "tests/p7zip-full.deb", "/home/user2/p7zip-full.deb")
+        res.append(ssh_checkout("0.0.0.0", "user2", "11", "echo '11' | sudo -S dpkg -i /home/user2/p7zip-full.deb",
+                                "Setting up"))
+        res.append(ssh_checkout("0.0.0.0", "user2", "11", "echo '11' | sudo -S dpkg -s p7zip-full",
+                                "Status: install ok installed"))
+        assert all(res)
+
     def test_step1(self, clear_folders, make_files, add_log_file):
         res1 = find_subprocess(f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
         res2 = find_subprocess(f"ls {data['out']}", "arx2.7z")

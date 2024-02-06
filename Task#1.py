@@ -106,7 +106,12 @@ class Test_positiv:
         res1 = find_subprocess(f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
         res2 = find_subprocess(f"ls {data['out']}", "arx2.7z")
         assert res1 and res2, "test1 FAIL"
-
+    ########
+    def test_step1_ssh(self, clear_folders, make_files, add_log_file):
+        res1 = ssh_checkout("0.0.0.0", "user2", "11" ,f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
+        res2 = ssh_checkout("0.0.0.0", "user2", "11", f"ls {data['out']}", "arx2.7z")
+        assert res1 and res2, "test1 FAIL"
+    ########
     def test_step2(self, clear_folders, make_files, add_log_file):
         res = []
         res.append(find_subprocess(f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k"))

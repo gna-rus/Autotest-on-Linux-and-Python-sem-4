@@ -2,20 +2,22 @@ import pytest
 import random, string
 import yaml
 from datetime import datetime
-from sshcmd import ssh_checkout, ssh_getout, upload_files, download_files, ssh_checkout_negative
+from sshcmad import ssh_checkout, ssh_getout, upload_files, download_files, ssh_checkout_negative
 import subprocess
 
 # dpkg -l | grep 7zip - команда для поиска пакета в системе (первая часть выдает просто список всех пакетов,
 # вторая - ищем конкретный пакет)
-# dpkg -r 7zip-full -удаление пакета
+# dpkg -r p7zip-full -удаление пакета
 # su <name_user> - команда для перехода от юзера к юзеру
 # sudo dpkg -i ./p7zip-full.ded - установка 7z
-
+# sudo useradd -m user2 - создать пользователя
+# sudo passwd user2 - задать пароль пользователя
+# su user2 - перейти в пользователя (exit - чтобы выйти из пользователя)
+# getent passwd - список всех пользователей
 
 with open('config.yaml') as f:
     # читаем документ YAML
     data = yaml.safe_load(f)
-
 
 def checkout(comand, text):
     result = subprocess.run(comand, shell=True, stdout=subprocess.PIPE, encoding='utf-8')

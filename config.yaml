@@ -1,0 +1,14 @@
+folder_in: /home/user/tst
+folder_out: /home/user/out
+folder_ext: /home/user/folder1
+folder_ext2: /home/user/folder2
+tst: /home/user/tst
+out: /home/user/out
+folder1: /home/user/folder1
+
+host: 0.0.0.0
+user_name: user2
+passwd: 11
+
+count: 1
+bs: 1M

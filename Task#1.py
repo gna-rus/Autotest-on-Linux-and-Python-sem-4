@@ -66,7 +66,6 @@ def print_time():
     yield
     print(f"Finish: {datetime.now().strftime('%H:%M:%S.%f')}")
 
-
 @pytest.fixture()
 def add_log_file():
     # Task#1
@@ -80,7 +79,6 @@ def add_log_file():
         # Task#2
         info_load_of_process = subprocess.run(f"cat /proc/loadavg", shell=True, stdout=subprocess.PIPE, encoding='utf-8')
         f.write(f"{time} - Number files: {number_file_in_folder} - Size of file: {size_of_file} - {info_load_of_process}\n")
-
 
 def find_subprocess(path: str, text: str):
     result = subprocess.run(path, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
@@ -102,44 +100,39 @@ class Test_positiv:
                                 "Status: install ok installed"))
         assert all(res)
 
-    def test_step1(self, clear_folders, make_files, add_log_file):
-        res1 = find_subprocess(f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
-        res2 = find_subprocess(f"ls {data['out']}", "arx2.7z")
-        assert res1 and res2, "test1 FAIL"
     ########
     def test_step1_ssh(self, clear_folders, make_files, add_log_file):
-        res1 = ssh_checkout("0.0.0.0", "user2", "11" ,f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
-        res2 = ssh_checkout("0.0.0.0", "user2", "11", f"ls {data['out']}", "arx2.7z")
+        res1 = ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}" ,f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
+        res2 = ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"ls {data['out']}", "arx2.7z")
         assert res1 and res2, "test1 FAIL"
-    ########
-    def test_step2(self, clear_folders, make_files, add_log_file):
+
+    def test_step2_ssh(self, clear_folders, make_files, add_log_file):
         res = []
-        res.append(find_subprocess(f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k"))
-        res.append(find_subprocess(f"cd {data['out']}; 7z e arx2.7z -o{data['folder1']} -y", "Everything is 0k"))
+        res.append(ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k"))
+        res.append(ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['out']}; 7z e arx2.7z -o{data['folder1']} -y", "Everything is 0k"))
 
         for item in make_files:
             res.append(find_subprocess(f"ls {data['folder1']}", item))
         assert all(res), "test2 FAIL"
 
-    def test_step3(self, add_log_file):
-        assert find_subprocess(f"cd {data['out']}/out; 7z l arx2.7z", "1 files"), "test3 FAIL"
+    def test_step3_ssh(self, add_log_file):
+        assert ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['out']}/out; 7z l arx2.7z", "1 files"), "test3 FAIL"
 
-    def test_step4(self, add_log_file):
+    def test_step4_ssh(self, add_log_file):
         # t: проверка целостности архива
-        assert find_subprocess(f"cd {data['out']}/out; 7z t arx2.7z", 'Everything is Ok'), "test4 FAIL"
+        assert ssh_checkout(f"{data['host']}", f"{data['user_name']}",f"{data['passwd']}", f"cd {data['out']}/out; 7z t arx2.7z", 'Everything is Ok'), "test4 FAIL"
 
-    def test_step5(self, add_log_file):
+    def test_step5_ssh(self, add_log_file):
+        assert ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['out']}/out; 7z d arx2.7z", 'Everything is Ok'), "test5 FAIL"
 
-        assert find_subprocess(f"cd {data['out']}/out; 7z d arx2.7z", 'Everything is Ok'), "test5 FAIL"
+    def test_step6_ssh(self, add_log_file):
+        assert ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['out']}/out; 7z u arx2.7z", 'Everything is Ok'), "test6 FAIL"
 
-    def test_step6(self, add_log_file):
+    def test_step7_ssh(self, clear_folders, make_files, add_log_file):
+        ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
+        assert ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['out']} && 7z x arx2.7z -o{data['folder1']}", 'Everything is Ok'), "test7 FAIL"
 
-        assert find_subprocess(f"cd {data['out']}/out; 7z u arx2.7z", 'Everything is Ok'), "test6 FAIL"
-
-
-    def test_step7(self, clear_folders, make_files, add_log_file):
-        find_subprocess(f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
-        assert find_subprocess(f"cd {data['out']} && 7z x arx2.7z -o{data['folder1']}", 'Everything is Ok'), "test7 FAIL"
+    ########
 
     # def test_step 8(self, clear_folders, make_files):
     #

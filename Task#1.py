@@ -134,14 +134,4 @@ class Test_positiv:
         ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['tst']}; 7z a {data['out']}/arx2", "Everything is 0k")
         assert ssh_checkout(f"{data['host']}", f"{data['user_name']}", f"{data['passwd']}", f"cd {data['out']} && 7z x arx2.7z -o{data['folder1']}", 'Everything is Ok'), "test7 FAIL"
 
-    ########
-
-    # def test_step 8(self, clear_folders, make_files):
-    #
-    # # test8
-    # res = []
-    # for i in make_files:
-    #     res.append(checkout("cd {}; 7z h {}}".format("args: data["folder_in"], i), text: "Everything is Ok"))
-    #     hash = getout("cd {}; crc32 {}".format("args: data["folder_in"], i)).upper()
-    #     res.append(checkout("cd {}; 7z h {}".format("args: data["folder_in"], i), hash))
-    #     assert all(res), "test8 FAIL"
+   
